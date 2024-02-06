@@ -1,0 +1,319 @@
+syntax = "proto3";
+
+option go_package = "/area;area";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+package proto;
+
+service AreaService {
+    rpc GetAllAreas(RequestAll) returns (Areas);
+    rpc GetAreaByID(RequestByID) returns (Area);
+    rpc AuthorizeUser(RequestByID) returns (Authorization);
+    rpc GetLeafParentByID(RequestAll) returns (LeafParents);
+    rpc GetFarmByID(RequestByID) returns (Areas);
+    rpc GetAreasNames(RequestByMultipleID) returns  (AreaNameResponse);
+    rpc GetAllMappingAreas(RequestByID) returns (MultipleMappingAreas);
+    rpc GetFarmsByID(RequestByID) returns (MultipleFarms);
+    rpc GetFarmsWithChildrenByID(RequestByID) returns (MultipleCompleteFarm);
+    rpc GetFarmsDataByID(RequestByID) returns (MultipleBranchs);
+    rpc GetBranchsDataByID(RequestByID) returns (MultipleAreaMappingArea);
+    rpc GetFarmsByClientID(RequestByID) returns (MultipleFarms);
+    rpc GetCompleteFarmsClientID(RequestByID) returns (MultipleCompleteFarm);
+    rpc CreateMappingAreas(RequestCreateMappingAreas) returns (ResponseCreatedMappingAreas);
+    rpc UpdateMappingAreas(RequestUpdateMappingAreas) returns (ResponseCreatedMappingAreas);
+    rpc DeleteMappingAreas(RequestDeleteMappingAreas) returns (Empty);
+    rpc CreateFarm(RequestCreateFarm) returns (ResponseCreatedFarm);
+    rpc UpdateFarm(RequestUpdateFarm) returns (ResponseUpdateFarm);
+    rpc DeleteFarm(RequestDeleteFarm) returns (Empty);
+    rpc CreateBranch(RequestCreateBranch) returns (ResponseCreatedBranch);
+    rpc UpdateBranch(RequestUpdateBranch) returns (CreatedBranchsReturned);
+    rpc DeleteBranch(RequestDeleteBranch) returns (Empty);
+    rpc DeleteArea(RequestDeleteArea) returns (Empty);
+    rpc CreateArea(RequestCreateArea) returns (CreateAreaResponse);
+    rpc UpdateArea(RequestUpdateArea) returns (ResponseUpdatedArea);
+}
+
+message Area {
+    int64 id = 1;
+    google.protobuf.Int64Value mappingAreaID = 2;
+    google.protobuf.Int64Value branchAreaID = 3;
+    google.protobuf.Int64Value farmAreaID = 4;
+    string bounds = 5;
+    string centroid = 6;
+    google.protobuf.Timestamp created = 7;
+    google.protobuf.Timestamp lastUpdate = 8;
+    google.protobuf.StringValue name = 9;
+}
+
+message LeafParent{
+    string farmName = 1;
+    int64 farmID = 2;
+    string branchName = 3;
+    int64 branchID = 4;
+    bool isDefaultBranch = 5;
+    Areas areas=6;
+    google.protobuf.Int64Value pageNumbers=7;
+
+}
+
+message LeafParents{
+    int64 nPaginas=1;
+    repeated LeafParent leafparents=2;
+}
+
+message Areas {
+    repeated Area areas = 1;
+}
+
+message RequestByID {
+    int64 id = 1;
+    User user = 2;
+}
+
+message RequestAll {
+    User user = 2;
+    google.protobuf.StringValue sortType =3;
+    google.protobuf.Int64Value pageSize=4;
+    google.protobuf.Int64Value page=5;
+}
+
+
+message Authorization {
+    bool isAuthorized = 1;
+}
+
+message User {
+    string userID = 1;
+    string email = 2;
+    int64 clientID = 3;
+    repeated string groups = 4;
+}
+
+
+message RequestByMultipleID {
+    repeated string areasID = 1;
+}
+
+message AreaNameResponse {
+    repeated AreaName areasInfo = 1;
+}
+
+message AreaName {
+    string areaID = 1;
+    string areaName = 2; 
+}
+
+message MultipleBranchs{
+    repeated Branch branch=1;
+}
+
+message Branch {
+    int64 branchID = 1;
+    string name =2;
+}
+
+message MultipleFarms{
+    repeated Farms farms =1;
+}
+
+message Farms{
+    int64 farmID =1;
+    string name=2;
+    string mappingAreaName=3;
+    int64 mappingAreaID = 4; 
+}
+
+message MultipleCompleteFarm{
+    repeated CompleteFarm farms = 1;
+}
+
+message CompleteFarm{
+    int64 farmID =1;
+    string name=2;
+    string mappingAreaName=3;
+    repeated BranchWithAreas branchs = 4;
+}
+
+message BranchWithAreas{
+    int64 branchID = 1;
+    string name = 2;
+    repeated AreaMappingArea areas = 3;
+}
+
+message MultipleMappingAreas{
+    repeated MappingArea mappingAreas=1;
+}
+
+message MappingArea{
+    bool active =1;
+    google.protobuf.Timestamp created =2;
+    string description =3;
+    google.protobuf.Timestamp effectiveEndDate =4;
+    google.protobuf.Timestamp effectiveStartDate=5;
+    google.protobuf.Timestamp inactivationDate =6;
+    int64 mappingAreaID=7;
+}
+
+message Pics{
+    string bounds =1;
+    bool onlyMonitoring=2;
+    string name=3;
+    int64 picID=4;
+}
+
+message MultipleAreaMappingArea{
+    repeated AreaMappingArea areas=1;
+}
+
+message AreaMappingArea {
+    int64 id=1;
+    string bounds = 2;
+    google.protobuf.Int64Value cc=3;
+    google.protobuf.DoubleValue da=4;
+    repeated Pics pics=5;
+    google.protobuf.Int64Value pmp=6;
+    string name =7;
+}
+
+message RequestCreateMappingAreas {
+    string description = 1;
+    User user = 2;
+}
+
+message ResponseCreatedMappingAreas {
+    int64 id = 1;
+    string description = 2;
+    google.protobuf.Timestamp created = 3;
+    google.protobuf.Timestamp lastUpdate = 4;
+    bool active = 5;
+    string inactivationDate = 6;
+}
+
+message RequestUpdateMappingAreas {
+    int64 id = 1;
+    string description = 2;
+    bool active = 3;
+    User user = 4;
+}
+
+message RequestDeleteMappingAreas {
+    User User = 1;
+    int64 id = 2;
+}
+
+message CreatedFarms {
+    string name = 1;
+    int64 mappingAreasID = 2;
+}
+
+message CreatedFarmsReturned {
+    int64 id = 1;
+    string name = 2;
+    int64 mappingAreasID = 3;
+}
+
+message RequestCreateFarm {
+    repeated CreatedFarms farms = 1;
+    User user = 2;
+}
+
+message ResponseCreatedFarm {
+    repeated CreatedFarmsReturned farms = 1;
+}
+
+message UpdatedFarm {
+    int64 id = 1;
+    string name = 2;
+    int64 mappingAreasID = 3;
+}
+
+message RequestUpdateFarm {
+    UpdatedFarm farm = 1;
+    User user = 2;
+}
+
+message ResponseUpdateFarm {
+    CreatedFarmsReturned farm = 1;
+}
+
+message RequestDeleteFarm {
+    int64 id = 1;
+    User user = 2;
+}
+
+message Empty{
+}
+
+message CreatedBranchs {
+    string name = 1;
+    int64 areaFarmID = 2;
+}
+
+message RequestCreateBranch {
+    repeated CreatedBranchs branchs = 1;
+    User user = 2;
+}
+
+message CreatedBranchsReturned {
+    int64 areaFarmID = 1;
+    int64 areaBranchID = 2;
+    string name = 3;
+}
+
+message ResponseCreatedBranch {
+    repeated CreatedBranchsReturned branchs = 1;
+}
+
+message RequestUpdateBranch {
+    User user = 1;
+    int64 branchID = 2;
+    string name = 3;
+    int64 farmID = 4;
+}
+
+message RequestDeleteBranch {
+    User user = 1;
+    int64 branchID = 2;
+}
+
+message RequestDeleteArea {
+    User user = 1;
+    int64 areaID = 2;
+}
+
+message CreateArea {
+    string bounds = 1;
+    string name = 2;
+    int64 branchID = 3;
+    int64 cc = 4;
+    int64 pmp = 5;
+    int64 da = 6;
+}
+
+message RequestCreateArea {
+    CreateArea area = 1;
+    User user = 2;
+}
+
+message CreateAreaResponse {
+    int64 id = 1;
+    int64  mappingAreaID = 2;
+    string bounds = 3;
+    string name = 4;
+    int64 branchID = 5;
+    int64 cc = 6;
+    int64 pmp = 7;
+    int64 da = 8;
+}
+
+message RequestUpdateArea {
+    User user = 1;
+    int64 id = 2;
+    string name = 3;
+}
+
+message ResponseUpdatedArea {
+    string name = 1;
+}
